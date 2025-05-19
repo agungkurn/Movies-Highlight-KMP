@@ -13,7 +13,6 @@ import id.ak.movieshighlight.di.dataSourceModule
 import id.ak.movieshighlight.di.repositoryModule
 import id.ak.movieshighlight.di.serviceModule
 import id.ak.movieshighlight.di.viewModelModule
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinApplication
 
 @Composable
@@ -25,7 +24,6 @@ fun AppTheme(content: @Composable () -> Unit) {
 }
 
 @Composable
-@Preview
 fun App() {
     KoinApplication(
         application = {

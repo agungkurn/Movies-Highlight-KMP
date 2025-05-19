@@ -44,6 +44,7 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.napier)
             implementation(project.dependencies.platform(libs.koin.bom))
             implementation(libs.bundles.koin)
             implementation(libs.bundles.api)

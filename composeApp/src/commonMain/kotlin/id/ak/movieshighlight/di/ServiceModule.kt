@@ -1,11 +1,15 @@
 package id.ak.movieshighlight.di
 
 import id.ak.movieshighlight.BuildKonfig
+import io.github.aakira.napier.DebugAntilog
+import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.auth.Auth
+import io.ktor.client.plugins.auth.providers.BearerTokens
+import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
-import io.ktor.client.plugins.logging.DEFAULT
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
@@ -13,9 +17,7 @@ import io.ktor.client.request.accept
 import io.ktor.http.ContentType
 import io.ktor.http.URLProtocol
 import io.ktor.http.contentType
-import io.ktor.http.parameters
 import io.ktor.http.path
-import io.ktor.http.set
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
@@ -33,7 +35,6 @@ val serviceModule = module {
             install(ContentNegotiation) {
                 json(
                     Json {
-                        prettyPrint = true
                         isLenient = true
                         ignoreUnknownKeys = true
                     }
@@ -42,8 +43,12 @@ val serviceModule = module {
 
             // install logger
             install(Logging) {
-                logger = Logger.DEFAULT
-                level = LogLevel.HEADERS
+                logger = object : Logger {
+                    override fun log(message: String) {
+                        Napier.d(tag = "ktor") { message }
+                    }
+                }
+                level = LogLevel.BODY
             }
 
             // timeout
@@ -61,9 +66,17 @@ val serviceModule = module {
                     // set base url
                     host = BASE_URL
                     path("3/")
-                    parameters.append("api_key", BuildKonfig.API_KEY)
                 }
             }
-        }
+
+            // token
+            install(Auth) {
+                bearer {
+                    loadTokens {
+                        BearerTokens(accessToken = BuildKonfig.API_KEY, refreshToken = null)
+                    }
+                }
+            }
+        }.also { Napier.base(DebugAntilog()) }
     }
 }
