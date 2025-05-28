@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.buildKonfig)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
 }
 
 kotlin {
@@ -51,8 +52,7 @@ kotlin {
             implementation(libs.bundles.api)
             implementation(libs.bundles.coil)
             implementation(libs.navigation)
-            implementation(libs.datastore)
-            implementation(libs.datastore.preferences)
+            implementation(libs.bundles.androidx.datastore)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
