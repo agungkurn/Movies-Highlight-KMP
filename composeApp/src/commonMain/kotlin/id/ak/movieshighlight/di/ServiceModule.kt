@@ -25,7 +25,7 @@ import kotlin.time.Duration.Companion.minutes
 
 private const val BASE_URL = "api.themoviedb.org"
 
-val serviceModule = module {
+val remoteServiceModule = module {
     single<HttpClient> {
         HttpClient {
             // throws error on non-2xx code
