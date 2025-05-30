@@ -6,7 +6,7 @@ import androidx.room.RoomDatabase
 import id.ak.movieshighlight.data.local.room.WatchlistDatabase
 
 fun getDatabaseBuilder(appContext: Context): RoomDatabase.Builder<WatchlistDatabase> {
-    val dbFile = appContext.getDatabasePath("watchlist.db")
+    val dbFile = appContext.getDatabasePath(WatchlistDatabase.DB_NAME)
 
     return Room.databaseBuilder<WatchlistDatabase>(
         context = appContext,

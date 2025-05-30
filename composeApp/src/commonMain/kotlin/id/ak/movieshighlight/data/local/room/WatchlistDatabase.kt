@@ -20,4 +20,8 @@ expect object WatchlistDatabaseConstructor : RoomDatabaseConstructor<WatchlistDa
 @ConstructedBy(WatchlistDatabaseConstructor::class)
 abstract class WatchlistDatabase : RoomDatabase() {
     abstract fun watchlistDao(): WatchlistDao
+
+    companion object {
+        const val DB_NAME = "watchlist.db"
+    }
 }

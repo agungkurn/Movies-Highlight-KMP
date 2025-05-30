@@ -18,7 +18,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.PlaylistAdd
-import androidx.compose.material.icons.filled.PlaylistRemove
+import androidx.compose.material.icons.automirrored.filled.PlaylistAddCheck
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -154,7 +154,7 @@ fun DetailsScreen(
                                         }
                                     ) {
                                         Icon(
-                                            Icons.Default.PlaylistRemove,
+                                            Icons.AutoMirrored.Filled.PlaylistAddCheck,
                                             contentDescription = "remove from watchlist"
                                         )
                                     }

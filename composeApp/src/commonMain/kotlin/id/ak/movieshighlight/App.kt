@@ -39,8 +39,11 @@ fun AppTheme(colorScheme: ColorScheme, content: @Composable () -> Unit) {
 }
 
 @Composable
-fun App(databaseBuilder: RoomDatabase.Builder<WatchlistDatabase>) {
-    val dataStore = rememberPreferencesDataStore()
+fun App(
+    dataStorePath: String,
+    databaseBuilder: RoomDatabase.Builder<WatchlistDatabase>
+) {
+    val dataStore = rememberPreferencesDataStore(dataStorePath)
     val database = rememberWatchlistDatabase(databaseBuilder)
 
     val platformModule = remember(dataStore) {

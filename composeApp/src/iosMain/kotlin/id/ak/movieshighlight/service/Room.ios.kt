@@ -9,7 +9,7 @@ import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
 
 fun getDatabaseBuilder(): RoomDatabase.Builder<WatchlistDatabase> {
-    val dbFilePath = documentDirectory() + "/my_room.db"
+    val dbFilePath = documentDirectory() + "/${WatchlistDatabase.DB_NAME}"
     return Room.databaseBuilder<WatchlistDatabase>(
         name = dbFilePath,
     )

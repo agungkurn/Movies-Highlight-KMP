@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.FeaturedPlayList
+import androidx.compose.material.icons.automirrored.filled.PlaylistPlay
 import androidx.compose.material.icons.filled.AutoMode
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
@@ -96,7 +96,7 @@ fun HomeScreen(
                     }
                     IconButton(onClick = openWatchlist) {
                         Icon(
-                            Icons.AutoMirrored.Filled.FeaturedPlayList,
+                            Icons.AutoMirrored.Filled.PlaylistPlay,
                             contentDescription = "watchlist"
                         )
                     }
