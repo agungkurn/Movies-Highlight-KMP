@@ -1,5 +1,6 @@
 package id.ak.movieshighlight.data.model.remote
 
+import id.ak.movieshighlight.BuildKonfig
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -100,7 +101,7 @@ data class TvDetailsResponse(
 ) {
     val fullPosterPath: String
         get() = buildString {
-            append("https://image.tmdb.org/t/p/original")
+            append(BuildKonfig.BASE_IMAGE_URL)
             append(posterPath)
         }
 

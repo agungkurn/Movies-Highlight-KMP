@@ -10,7 +10,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import id.ak.movieshighlight.composables.home.FilmItem
+import id.ak.movieshighlight.composables.FilmItem
 import id.ak.movieshighlight.data.model.remote.DiscoverMovieModel
 import id.ak.movieshighlight.state.UiState
 

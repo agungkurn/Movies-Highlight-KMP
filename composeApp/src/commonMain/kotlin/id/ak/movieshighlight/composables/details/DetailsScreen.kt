@@ -1,5 +1,6 @@
 package id.ak.movieshighlight.composables.details
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,11 +17,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.PlaylistAdd
+import androidx.compose.material.icons.filled.PlaylistRemove
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,8 +35,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -43,6 +49,7 @@ import id.ak.movieshighlight.data.model.remote.TvDetailsResponse
 import id.ak.movieshighlight.ext.formatCurrency
 import id.ak.movieshighlight.ext.formatLocalNumber
 import id.ak.movieshighlight.state.UiState
+import kotlinx.coroutines.launch
 import movieshighlight.composeapp.generated.resources.Res
 import movieshighlight.composeapp.generated.resources.baseline_18_up_rating_24
 import org.jetbrains.compose.resources.painterResource
@@ -57,8 +64,43 @@ fun DetailsScreen(
     modifier: Modifier = Modifier,
     viewModel: DetailsViewModel = koinViewModel()
 ) {
-    val movieState by viewModel.movie.collectAsState()
-    val tvSeriesState by viewModel.tvSeries.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+
+    val movieState by viewModel.movieState.collectAsState()
+    val tvSeriesState by viewModel.tvSeriesState.collectAsState()
+    val isInWatchlist by viewModel.isInWatchlist.collectAsState()
+
+    val filmId by remember {
+        derivedStateOf {
+            if (isMovie) {
+                (movieState as? UiState.Success<MovieDetailsResponse>)?.data?.id
+            } else {
+                (tvSeriesState as? UiState.Success<TvDetailsResponse>)?.data?.id
+            }
+        }
+    }
+    val posterUrl by remember {
+        derivedStateOf {
+            if (isMovie) {
+                (movieState as? UiState.Success<MovieDetailsResponse>)?.data?.fullPosterPath
+            } else {
+                (tvSeriesState as? UiState.Success<TvDetailsResponse>)?.data?.fullPosterPath
+            }
+        }
+    }
+    val title by remember {
+        derivedStateOf {
+            if (isMovie) {
+                (movieState as? UiState.Success<MovieDetailsResponse>)?.data?.let {
+                    it.title ?: it.originalTitle.orEmpty()
+                }
+            } else {
+                (tvSeriesState as? UiState.Success<TvDetailsResponse>)?.data?.let {
+                    it.name ?: it.originalName.orEmpty()
+                }
+            }
+        }
+    }
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -78,6 +120,18 @@ fun DetailsScreen(
         }
     }
 
+    fun onWatchlistChanged(added: Boolean) {
+        snackbarHostState.currentSnackbarData?.dismiss()
+
+        coroutineScope.launch {
+            if (added) {
+                snackbarHostState.showSnackbar("Added to watchlist")
+            } else {
+                snackbarHostState.showSnackbar("Removed from watchlist")
+            }
+        }
+    }
+
     BottomSheetScaffold(
         modifier = modifier,
         topBar = {
@@ -86,6 +140,47 @@ fun DetailsScreen(
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back")
+                    }
+                },
+                actions = {
+                    AnimatedContent(targetState = isInWatchlist) { inWatchlist ->
+                        filmId?.let { id ->
+                            when (inWatchlist) {
+                                true -> {
+                                    FilledTonalIconButton(
+                                        onClick = {
+                                            viewModel.removeFromWatchlist(id)
+                                            onWatchlistChanged(false)
+                                        }
+                                    ) {
+                                        Icon(
+                                            Icons.Default.PlaylistRemove,
+                                            contentDescription = "remove from watchlist"
+                                        )
+                                    }
+                                }
+
+                                false -> {
+                                    IconButton(
+                                        onClick = {
+                                            viewModel.addToWatchlist(
+                                                id = id,
+                                                posterUrl = posterUrl.orEmpty(),
+                                                title = title.orEmpty()
+                                            )
+                                            onWatchlistChanged(true)
+                                        }
+                                    ) {
+                                        Icon(
+                                            Icons.AutoMirrored.Filled.PlaylistAdd,
+                                            contentDescription = "add to watchlist"
+                                        )
+                                    }
+                                }
+
+                                null -> {}
+                            }
+                        }
                     }
                 }
             )
@@ -127,7 +222,7 @@ fun DetailsScreen(
             (movieState as? UiState.Success)?.data?.let { movie ->
                 AsyncImage(
                     modifier = Modifier.fillMaxWidth(),
-                    model = movie.fullPosterPath,
+                    model = posterUrl,
                     contentDescription = movie.title ?: movie.originalTitle,
                     contentScale = ContentScale.FillWidth
                 )
@@ -136,7 +231,7 @@ fun DetailsScreen(
             (tvSeriesState as? UiState.Success)?.data?.let { tvSeries ->
                 AsyncImage(
                     modifier = Modifier.fillMaxWidth(),
-                    model = tvSeries.fullPosterPath,
+                    model = posterUrl,
                     contentDescription = tvSeries.name ?: tvSeries.originalName,
                     contentScale = ContentScale.FillWidth
                 )

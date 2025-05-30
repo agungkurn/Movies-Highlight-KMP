@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.FeaturedPlayList
 import androidx.compose.material.icons.filled.AutoMode
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
@@ -45,6 +46,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun HomeScreen(
     openMovieDetails: (Int) -> Unit,
     openTvSerialDetails: (Int) -> Unit,
+    openWatchlist: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = koinViewModel()
 ) {
@@ -52,7 +54,7 @@ fun HomeScreen(
     val moviesState by viewModel.movies.collectAsState()
     val tvSeriesState by viewModel.tvSeries.collectAsState()
 
-    val icon = remember(currentTheme) {
+    val themeIcon = remember(currentTheme) {
         when (currentTheme) {
             ThemeMode.System -> Icons.Default.AutoMode
             ThemeMode.Dark -> Icons.Default.DarkMode
@@ -87,7 +89,16 @@ fun HomeScreen(
                 title = { Text("Movies Highlight") },
                 actions = {
                     IconButton(onClick = viewModel::toggleTheme) {
-                        Icon(icon, contentDescription = stringResource(currentTheme.stringResource))
+                        Icon(
+                            themeIcon,
+                            contentDescription = stringResource(currentTheme.stringResource)
+                        )
+                    }
+                    IconButton(onClick = openWatchlist) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.FeaturedPlayList,
+                            contentDescription = "watchlist"
+                        )
                     }
                 }
             )

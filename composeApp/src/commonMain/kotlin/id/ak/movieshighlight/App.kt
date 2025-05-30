@@ -13,14 +13,18 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import androidx.room.RoomDatabase
 import id.ak.movieshighlight.composables.details.DetailsScreen
 import id.ak.movieshighlight.composables.home.HomeScreen
+import id.ak.movieshighlight.composables.watchlist.WatchlistScreen
+import id.ak.movieshighlight.data.local.room.WatchlistDatabase
 import id.ak.movieshighlight.data.model.local.ThemeMode
 import id.ak.movieshighlight.di.dataSourceModule
 import id.ak.movieshighlight.di.remoteServiceModule
 import id.ak.movieshighlight.di.repositoryModule
 import id.ak.movieshighlight.di.viewModelModule
 import id.ak.movieshighlight.service.rememberPreferencesDataStore
+import id.ak.movieshighlight.service.rememberWatchlistDatabase
 import id.ak.movieshighlight.ui.AdjustSystemBar
 import org.koin.compose.KoinApplication
 import org.koin.compose.viewmodel.koinViewModel
@@ -35,11 +39,14 @@ fun AppTheme(colorScheme: ColorScheme, content: @Composable () -> Unit) {
 }
 
 @Composable
-fun App() {
+fun App(databaseBuilder: RoomDatabase.Builder<WatchlistDatabase>) {
     val dataStore = rememberPreferencesDataStore()
-    val dataStoreModule = remember(dataStore) {
+    val database = rememberWatchlistDatabase(databaseBuilder)
+
+    val platformModule = remember(dataStore) {
         module {
             single { dataStore }
+            single { database }
         }
     }
 
@@ -50,7 +57,7 @@ fun App() {
                 repositoryModule,
                 dataSourceModule,
                 remoteServiceModule,
-                dataStoreModule
+                platformModule
             )
         }
     ) {
@@ -81,6 +88,9 @@ fun App() {
                         openTvSerialDetails = {
                             val route = MainRoute.Details(id = it, isMovie = false)
                             navController.navigate(route)
+                        },
+                        openWatchlist = {
+                            navController.navigate(MainRoute.Watchlist)
                         }
                     )
                 }
@@ -91,6 +101,19 @@ fun App() {
                         id = details.id,
                         isMovie = details.isMovie,
                         onNavigateUp = { navController.popBackStack() }
+                    )
+                }
+                composable<MainRoute.Watchlist> {
+                    WatchlistScreen(
+                        onNavigateUp = { navController.popBackStack() },
+                        openMovieDetails = {
+                            val route = MainRoute.Details(id = it, isMovie = true)
+                            navController.navigate(route)
+                        },
+                        openTvSerialDetails = {
+                            val route = MainRoute.Details(id = it, isMovie = false)
+                            navController.navigate(route)
+                        }
                     )
                 }
             }

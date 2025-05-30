@@ -53,6 +53,7 @@ kotlin {
             implementation(libs.bundles.coil)
             implementation(libs.navigation)
             implementation(libs.bundles.androidx.datastore)
+            implementation(libs.androidx.room.runtime)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -92,6 +93,11 @@ android {
 
 dependencies {
     debugImplementation(compose.uiTooling)
+    add("kspCommonMainMetadata", libs.androidx.room.compiler)
+    add("kspAndroid", libs.androidx.room.compiler)
+    add("kspIosX64", libs.androidx.room.compiler)
+    add("kspIosArm64", libs.androidx.room.compiler)
+    add("kspIosSimulatorArm64", libs.androidx.room.compiler)
 }
 
 buildkonfig {
@@ -99,8 +105,10 @@ buildkonfig {
 
     defaultConfigs {
         val apiKey = gradleLocalProperties(rootDir, providers).getProperty("api_key")
+        val baseImageUrl = gradleLocalProperties(rootDir, providers).getProperty("base_image_url")
 
         buildConfigField(FieldSpec.Type.STRING, "API_KEY", apiKey)
+        buildConfigField(FieldSpec.Type.STRING, "BASE_IMAGE_URL", baseImageUrl)
     }
 }
 
