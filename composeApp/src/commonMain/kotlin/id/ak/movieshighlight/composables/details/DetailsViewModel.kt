@@ -21,7 +21,7 @@ class DetailsViewModel(
     private val repository: MovieRepository,
     private val watchlistRepository: WatchlistRepository
 ) : ViewModel() {
-    private val isMovie = MutableStateFlow<Boolean?>(null)
+    private var isMovie: Boolean? = null
 
     private val _movieState = MutableStateFlow<UiState<MovieDetailsResponse>>(UiState.Idle)
     val movieState = _movieState.asStateFlow()
@@ -31,7 +31,7 @@ class DetailsViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val isInWatchlist =
-        combine(isMovie, _movieState, _tvSeriesState) { isMovie, movieState, tvSeriesState ->
+        combine(_movieState, _tvSeriesState) { movieState, tvSeriesState ->
             when (isMovie) {
                 true -> (movieState as? UiState.Success<MovieDetailsResponse>)?.data?.id?.let { id ->
                     watchlistRepository.isInWatchlist(id, true)
@@ -46,9 +46,8 @@ class DetailsViewModel(
         }.flattenConcat()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
-
     fun fetchDetails(id: Int, isMovie: Boolean) {
-        this.isMovie.value = isMovie
+        this.isMovie = isMovie
 
         viewModelScope.launch {
             if (isMovie) {
@@ -67,7 +66,7 @@ class DetailsViewModel(
 
     fun addToWatchlist(id: Int, posterUrl: String, title: String) {
         viewModelScope.launch {
-            when (isMovie.value) {
+            when (isMovie) {
                 true -> watchlistRepository.addMovie(id = id, posterUrl = posterUrl, title = title)
                 false -> watchlistRepository.addTvSeries(
                     id = id,
@@ -82,7 +81,7 @@ class DetailsViewModel(
 
     fun removeFromWatchlist(id: Int) {
         viewModelScope.launch {
-            when (isMovie.value) {
+            when (isMovie) {
                 true -> watchlistRepository.deleteMovie(id)
                 false -> watchlistRepository.deleteTvSeries(id)
                 null -> {}

@@ -54,6 +54,7 @@ kotlin {
             implementation(libs.navigation)
             implementation(libs.bundles.androidx.datastore)
             implementation(libs.androidx.room.runtime)
+            implementation(libs.kotlinx.datetime)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
