@@ -1,15 +1,14 @@
 package id.ak.movieshighlight.service
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
 import okio.Path.Companion.toPath
 
 internal const val dataStoreFileName = "theme.preferences_pb"
 
-@Composable
-fun rememberPreferencesDataStore(path: String) = remember {
-    PreferenceDataStoreFactory.createWithPath {
-        path.toPath()
-    }
+fun getPreferencesDataStore(path: String) = PreferenceDataStoreFactory.createWithPath {
+    path.toPath()
 }
+
+expect fun createPreferencesDataStore(): DataStore<Preferences>

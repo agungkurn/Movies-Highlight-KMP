@@ -1,6 +1,11 @@
 package id.ak.movieshighlight.di
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import id.ak.movieshighlight.BuildKonfig
+import id.ak.movieshighlight.data.local.room.WatchlistDatabase
+import id.ak.movieshighlight.service.createPreferencesDataStore
+import id.ak.movieshighlight.service.createWatchlistDatabase
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
@@ -24,6 +29,11 @@ import org.koin.dsl.module
 import kotlin.time.Duration.Companion.minutes
 
 private const val BASE_URL = "api.themoviedb.org"
+
+val localServiceModule = module {
+    single<DataStore<Preferences>> { createPreferencesDataStore() }
+    single<WatchlistDatabase> { createWatchlistDatabase() }
+}
 
 val remoteServiceModule = module {
     single<HttpClient> {

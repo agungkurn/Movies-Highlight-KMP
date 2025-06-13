@@ -1,5 +1,7 @@
 package id.ak.movieshighlight.service
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
@@ -15,4 +17,9 @@ fun getPreferencesDataStorePath(): String {
         error = null
     )
     return requireNotNull(documentDirectory).path + "/$dataStoreFileName"
+}
+
+actual fun createPreferencesDataStore(): DataStore<Preferences> {
+    val path = getPreferencesDataStorePath()
+    return getPreferencesDataStore(path)
 }

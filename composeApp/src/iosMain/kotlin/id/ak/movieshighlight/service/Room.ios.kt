@@ -8,15 +8,15 @@ import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
 
-fun getDatabaseBuilder(): RoomDatabase.Builder<WatchlistDatabase> {
-    val dbFilePath = documentDirectory() + "/${WatchlistDatabase.DB_NAME}"
+private fun getDatabaseBuilder(): RoomDatabase.Builder<WatchlistDatabase> {
+    val dbFilePath = getDocumentDirectory() + "/${WatchlistDatabase.DB_NAME}"
     return Room.databaseBuilder<WatchlistDatabase>(
         name = dbFilePath,
     )
 }
 
 @OptIn(ExperimentalForeignApi::class)
-private fun documentDirectory(): String {
+private fun getDocumentDirectory(): String {
     val documentDirectory = NSFileManager.defaultManager.URLForDirectory(
         directory = NSDocumentDirectory,
         inDomain = NSUserDomainMask,
@@ -25,4 +25,9 @@ private fun documentDirectory(): String {
         error = null,
     )
     return requireNotNull(documentDirectory?.path)
+}
+
+actual fun createWatchlistDatabase(): WatchlistDatabase {
+    val builder = getDatabaseBuilder()
+    return getRoomDatabase(builder)
 }
